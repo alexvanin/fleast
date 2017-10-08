@@ -32,10 +32,14 @@ class TwitchClient:
 		header, base = self.get_base('v6')
 		return self.do_q(base+q, header)
 
+	def raw_query_v5(self, q):
+		header, base = self.get_base('v5')
+		return self.do_q(base+q, header)
+
 	# Returns (ID, GAMENAME) or None
 	def get_game_id(self, name):
 		header, base = self.get_base('v5')
 		r = self.do_q('%s/search/games?query=%s' % (base, name), header)
 		if r.get('games', None): return (r['games'][0]['_id'], r['games'][0]['name'])
 		return None
-		
+
