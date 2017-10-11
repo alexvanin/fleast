@@ -4,14 +4,28 @@
 from twitch import TwitchClient 
 
 import json
+import cherrypy
+
+class FleastServer(object):
+	def __init__(self):
+		try:
+			with open('.token', 'r') as reader:
+				twitch_token = reader.read().strip()
+		except:
+			print("Cannot read token for twitch app, abort.")
+			exit(1)
+		client = TwitchClient(twitch_token, freq = 1)
+	
+	@cherrypy.expose
+	def index(self):
+		return 'Hello World'
+
+	@cherrypy.expose
+	def fleast(self, game, lang):
+		return game
 
 def main():
-	with open('.token', 'r') as reader:
-		twitch_token = reader.read().strip()
-
-	client = TwitchClient(twitch_token)
-	r = client.raw_query_v5('streams/?game=IRL&language=ru&limit=2')
-	print(json.dumps(r, indent=4))
+	cherrypy.quickstart(FleastServer())
 
 
 if __name__ == '__main__':

@@ -18,13 +18,17 @@ class TwitchClient:
 
 	def do_q(self, base, header):
 		self.lock.acquire()
-		delta = time.time() - self.last_q 
-		if delta < self.delay:
-			time.sleep(delta)
-		r = requests.get(base, headers=header).json()	 
-		self.last_q = time.time()
-		self.lock.release()
-		return r	
+		try:
+			delta = time.time() - self.last_q 
+			if delta < self.delay:
+				time.sleep(delta)
+			r = requests.get(base, headers=header).json()	 
+			self.last_q = time.time()
+		except:	
+			r = None
+		finally:
+			self.lock.release()
+			return r
 		
 	def get_base(self, ver):
 		if ver == 'v5': return (self.header_v5, self.urlbase_v5)
@@ -45,7 +49,7 @@ class TwitchClient:
 	def get_game_id(self, name):
 		header, base = self.get_base('v5')
 		r = self.do_q('%s/search/games?query=%s' % (base, name), header)
-		if r.get('games', None): return (r['games'][0]['_id'], r['games'][0]['name'])
+		if r and r.get('games'): return (r['games'][0]['_id'], r['games'][0]['name'])
 		return None
 
 	def get_game_list(self, name, lang, lim):
