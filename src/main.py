@@ -5,6 +5,7 @@ from twitch import TwitchClient
 
 import json
 import cherrypy
+from cherrypy.process.plugins import Daemonizer
 
 ver = '1.00'
 
@@ -42,7 +43,7 @@ class FleastServer(object):
 			return 'Internal Error<br>Tell me more at <a href="https://twitter.com/alexvanin">https://twitter.com/alexvanin</a>' 
 
 		if data['_total'] == 0: 
-			return self.templ_main.format( _stream_num_ = data['_total'], _stream_list_ = '', _version_ = ver)
+			return self.templ_main.format( _stream_num_ = data['_total'], _game_name_ = game, _stream_list_ = '', _version_ = ver)
 	
 		cherrypy.log('Found %d streams' % data['_total'])
 
@@ -57,6 +58,8 @@ class FleastServer(object):
 
 def main():
 	server = FleastServer()
+	d = Daemonizer(cherrypy.engine)
+	d.subscribe()
 	cherrypy.quickstart(server, '/fleast', './server.conf')
 
 
