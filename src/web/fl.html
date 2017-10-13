@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>FLeast</title>
+	<meta name="description" content="Simple HTML5 Page layout template with header, footer, sidebar etc.">
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<section id="header">
+		<strong><h1>FLeast - your least favorite streamers here</h1></strong>
+	</section>
+	<section id="pageContent">
+		<article>
+			<h2>Usage:</h2>
+			<p>Write down a game name and choose language </p>
+			<form method="get" action="./fleast">				
+			<table class="Input">
+				<tbody>
+					<tr>
+						<td><label>Game </label></td>
+						<td><label>Language </label></td>
+					</tr>
+					<tr>
+						<td><input name="game" type="text" maxlength="255" value=""/> </td>
+						<td><select class="element select medium" name="lang"> 
+							<option value="ru" selected="selected">ru</option>
+							<option value="en">eng</option>
+							</select>
+						</td>
+						<td><input type="submit" value="Search" /></td>
+					</tr>
+				</tbody>
+			</table>
+			</form>	
+		</article>
+
+	</section>
+	<footer>
+		<p>Developed by Alex Vanin | <a href="https://twitter.com/AlexVanin" target="_blank">twitter</a> | <a href="https://github.com/AlexVanin/fleast" target="_blank">github</a> </p>
+	</footer>
+</body>
+
+</html>

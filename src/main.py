@@ -11,38 +11,46 @@ class FleastServer(object):
 		try:
 			with open('.token', 'r') as reader:
 				self.twitch_token = reader.read().strip()
-		except:
-			print("Cannot read token for twitch app, abort.")
+			with open('./web/fl.html', 'r') as reader:
+				self.index = reader.read()
+			with open('./web/fl_template_main.html', 'r') as reader:
+				self.templ_main = reader.read()
+			with open('./web/fl_template_stream.html', 'r') as reader:
+				self.templ_stream = reader.read()
+		except e:
+			print("Cannot read token for twitch app or templates, abort.")
 			exit(1)
 		self.client = TwitchClient(self.twitch_token, freq = 1)
-	
+
 	@cherrypy.expose
 	def index(self):
 		return 'Hello World'
 
 	@cherrypy.expose
-	def fleast(self, game, lang):
+	def fleast(self, game=None, lang=None):
+		if game is None and lang is None:
+			return self.index
 		cherrypy.log('Getting game:"%s" language:%s' % (game, lang))
 		data = self.client.get_streams(game, lang)
 		if data is None:
-			return 'Error!' #Do better
+			return 'Internal Error' #Do Better
+
 		if data['_total'] == 0: 
-			return 'No streams found' #Do better
+			return self.templ_main.format(data['_total'], '')
 	
 		cherrypy.log('Found %d streams' % data['_total'])
 
-		result = '<html><head><title>Test</title></head><body>'
 		streams = sorted(data['streams'], key=lambda k: k['viewers'])
-		count = 0
+		result_str = ''
 		for s in streams:
-			result += '<a href="{0}"><img src="{1}"></a><br>{2}  ::  {3}<br>{4}<hr>'.format( \
-						s['channel']['url'], s['preview']['medium'], s['channel']['status'], \
-						s['channel']['display_name'], s['viewers'])
-		return result
+			result_str += self.templ_stream.format(s['channel']['url'], s['preview']['medium'],s['channel']['status'], \
+								s['channel']['display_name'], s['viewers']) +'\n'
+		return self.templ_main.format(data['_total'], result_str)
  
 
 def main():
-	cherrypy.quickstart(FleastServer())
+	server = FleastServer()
+	cherrypy.quickstart(server, '/','./server.conf')
 
 
 if __name__ == '__main__':
