@@ -2,3 +2,4 @@ src/__pycache__
 *.swp
 src/.token
 src/server.conf
+.*.log
