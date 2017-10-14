@@ -7,7 +7,7 @@ import json
 import cherrypy
 from cherrypy.process.plugins import Daemonizer
 
-ver = '1.00'
+ver = '1.01'
 
 
 class FleastServer(object):
@@ -21,10 +21,23 @@ class FleastServer(object):
 				self.templ_main = reader.read()
 			with open('./web/fl_template_stream.html', 'r') as reader:
 				self.templ_stream = reader.read()
+			with open('./web/fl_template_lang.html', 'r') as reader:
+				self.templ_lang = reader.read().splitlines()
 			self.client = TwitchClient(self.twitch_token, freq = 1)
-		except e:
+		except:
 			print("Cannot read token for twitch app or templates, abort.")
 			exit(1)
+
+	def set_templ_lang(self, lang):
+		templ = ''
+		end = False
+		for l in self.templ_lang:
+			if not end and 'option value="{}"'.format(lang) in l:
+				templ += l.format('selected') + '\n'
+				end = True
+				continue
+			templ += l.format(' ') + '\n'
+		return templ.rstrip()
 
 
 	@cherrypy.expose
@@ -33,8 +46,8 @@ class FleastServer(object):
 
 	@cherrypy.expose
 	def fleast(self, game=None, lang=None):
-		if game is None and lang is None:
-			return self.index_page.format(_version_ = ver)
+		if game is None or game == '':
+			return self.index_page.format(_version_ = ver, _opt_langs_ = self.set_templ_lang('ru'))
 
 		cherrypy.log('Getting game:"%s" language:%s' % (game, lang))
 		data = self.client.get_streams(game, lang)
@@ -43,7 +56,9 @@ class FleastServer(object):
 			return 'Internal Error<br>Tell me more at <a href="https://twitter.com/alexvanin">https://twitter.com/alexvanin</a>' 
 
 		if data['_total'] == 0: 
-			return self.templ_main.format( _stream_num_ = data['_total'], _game_name_ = game, _stream_list_ = '', _version_ = ver)
+			return self.templ_main.format( _stream_num_ = data['_total'], _game_name_ = game, \
+							_opt_langs_ = self.set_templ_lang(lang), _stream_list_ = '', \
+							_version_ = ver)
 	
 		cherrypy.log('Found %d streams' % data['_total'])
 
@@ -53,7 +68,9 @@ class FleastServer(object):
 			result_str += self.templ_stream.format(s['channel']['url'], s['preview']['medium'],s['channel']['status'], \
 								s['channel']['display_name'], s['viewers']) +'\n'
 
-		return self.templ_main.format(_stream_num_ = data['_total'], _game_name_ = game,  _stream_list_ = result_str, _version_ = ver)
+		return self.templ_main.format(_stream_num_ = data['_total'], _game_name_ = game, \
+						_opt_langs_ = self.set_templ_lang(lang), _stream_list_ = result_str,\
+						_version_ = ver)
  
 
 def main():

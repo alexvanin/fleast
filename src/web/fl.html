@@ -17,8 +17,8 @@
 	<section id="pageContent">
 		<article>
 			<h2>Usage:</h2>
-			<p>Write down a game name and choose language.<br>Name should be _exact_ name from Twitch i.e. csgo should be "Counter-Strike: Global Offensive" </p>
-			<form method="get" action="./">				
+			<p>Write the name of the game and select the language.<br>The name must _exactly_ match the name of the game on twitch.tv i.e. csgo must be "Counter-Strike: Global Offensive".</p>
+			<form method="get" action="./">
 			<table class="Input">
 				<tbody>
 					<tr>
@@ -28,8 +28,7 @@
 					<tr>
 						<td><input name="game" type="text" maxlength="255" value=""/> </td>
 						<td><select class="element select medium" name="lang"> 
-							<option value="ru" selected="selected">ru</option>
-							<option value="en">eng</option>
+{_opt_langs_}
 							</select>
 						</td>
 						<td><input type="submit" value="Search" /></td>
