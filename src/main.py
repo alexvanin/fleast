@@ -77,7 +77,7 @@ def main():
 	server = FleastServer()
 	d = Daemonizer(cherrypy.engine)
 	d.subscribe()
-	cherrypy.quickstart(server, '/fleast', './server.conf')
+	cherrypy.quickstart(server, '/', './server.conf')
 
 
 if __name__ == '__main__':
