@@ -27,11 +27,11 @@ class TwitchClient:
 				time.sleep(delta)
 			r = requests.get(base, headers=header).json()	 
 			self.last_q = time.time()
+			cherrypy.log('Request: OK')
 		except:	
 			cherrypy.log('Request: FAIL')
 			r = None
 		finally:
-			cherrypy.log('Request: OK')
 			self.lock.release()
 			return r
 		
