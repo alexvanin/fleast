@@ -7,8 +7,10 @@ import json
 import cherrypy
 from cherrypy.process.plugins import Daemonizer
 
-ver = '1.01'
+ver = '1.02'
 
+
+repl = {'"':'&quot;', '&':'&amp;', '<':'&lt;', '>':'&gt;' } 
 
 class FleastServer(object):
 	def __init__(self):
@@ -39,6 +41,12 @@ class FleastServer(object):
 			templ += l.format(' ') + '\n'
 		return templ.rstrip()
 
+	def to_html(self, text):
+		#return ''.join(repl.get(s,s) for s in text)
+		for i in repl:
+			text = text.replace(i, repl[i])
+		return text
+
 
 	@cherrypy.expose
 	def index(self, game=None, lang=None):
@@ -46,6 +54,7 @@ class FleastServer(object):
 
 	@cherrypy.expose
 	def fleast(self, game=None, lang=None):
+		game = game.rstrip()
 		if game is None or game == '':
 			return self.index_page.format(_version_ = ver, _opt_langs_ = self.set_templ_lang('ru'))
 
@@ -65,7 +74,7 @@ class FleastServer(object):
 		streams = sorted(data['streams'], key=lambda k: k['viewers'])
 		result_str = ''
 		for s in streams:
-			result_str += self.templ_stream.format(s['channel']['url'], s['preview']['medium'],s['channel']['status'], \
+			result_str += self.templ_stream.format(s['channel']['url'], s['preview']['medium'], self.to_html(s['channel']['status']), \
 								s['channel']['display_name'], s['viewers']) +'\n'
 
 		return self.templ_main.format(_stream_num_ = data['_total'], _game_name_ = game, \
@@ -75,8 +84,7 @@ class FleastServer(object):
 
 def main():
 	server = FleastServer()
-	d = Daemonizer(cherrypy.engine)
-	d.subscribe()
+	d = Daemonizer(cherrypy.engine).subscribe()
 	cherrypy.quickstart(server, '/', './server.conf')
 
 
