@@ -54,10 +54,10 @@ class FleastServer(object):
 
 	@cherrypy.expose
 	def fleast(self, game=None, lang=None):
-		game = game.rstrip()
 		if game is None or game == '':
 			return self.index_page.format(_version_ = ver, _opt_langs_ = self.set_templ_lang('ru'))
 
+		game = game.rstrip()
 		cherrypy.log('Getting game:"%s" language:%s' % (game, lang))
 		data = self.client.get_streams(game, lang)
 
