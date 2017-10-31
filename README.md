@@ -6,10 +6,10 @@ Least-favourite twitch streamers here
 + 1.00
 Initial release
 
-+1.01
++ 1.01
 Form data now saved between querries
 
-+1.02
++ 1.02
 Fixed some typos in text
 Fixed bug with chinese language streams
 Fixed bug when 0 streams are found if game name contains whitespaces in the end
