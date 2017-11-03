@@ -57,7 +57,7 @@ class TwitchClient:
 		if r and r.get('games'): return (r['games'][0]['_id'], r['games'][0]['name'])
 		return None
 
-	def get_streams(self, name, lang):
+	def get_live_streams(self, name, lang):
 		header, base = self.get_base('v5')
 		data = self.do_q('%s/streams/?game=%s&language=%s&limit=%s&stream_type=live' % (base, name, lang, 100), header)
 		if data is None: return None
@@ -69,6 +69,9 @@ class TwitchClient:
 			data['streams'].extend(r['streams'])
 			total = r['_total']; streams = len(data['streams'])
 
+		# Tweak for getting only live sterams
+		data['streams'] = [x for x in data['streams'] if x['stream_type'] == 'live']
+		data['_total'] = len(data['streams'])
 		return data
 
 

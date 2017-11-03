@@ -7,7 +7,7 @@ import json
 import cherrypy
 from cherrypy.process.plugins import Daemonizer
 
-ver = '1.02'
+ver = '1.03'
 
 
 repl = {'"':'&quot;', '&':'&amp;', '<':'&lt;', '>':'&gt;' } 
@@ -59,7 +59,7 @@ class FleastServer(object):
 
 		game = game.rstrip()
 		cherrypy.log('Getting game:"%s" language:%s' % (game, lang))
-		data = self.client.get_streams(game, lang)
+		data = self.client.get_live_streams(game, lang)
 
 		if data is None:
 			return 'Internal Error<br>Tell me more at <a href="https://twitter.com/alexvanin">https://twitter.com/alexvanin</a>' 
