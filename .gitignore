@@ -1,5 +1,5 @@
-src/__pycache__
+__pycache__
 *.swp
-src/.token
-src/server.conf
+.token
+server.conf
 .*.log
