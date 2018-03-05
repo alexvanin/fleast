@@ -16,12 +16,12 @@ hr{display:block;height:1px;border:0;border-top:1px solid #ccc;margin:1em 0;padd
 }
 
 main {
-	float: left;
-	width: 60%;
+    float: left;
+    width: 60%;
 }
 aside {
-	float: right;
-	width: 30%;
+    float: right;
+    width: 30%;
 }
 article {
     border-bottom: 2px dotted #999;
@@ -33,26 +33,26 @@ article h2 {
     margin-bottom: 12px;
 }
 article p {
-	
+    
 }
 main section {
-	
+    
 }
 footer {
-	background: #AEC6CF;
-	max-width: 1000px;
-	margin: auto;
-	clear: both;
-	text-align: right;
+    background: #AEC6CF;
+    max-width: 1000px;
+    margin: auto;
+    clear: both;
+    text-align: right;
 }
 footer p {
-	padding: 20px;
+    padding: 20px;
 }
 
 aside > div {
-	margin: 10px auto;
-	background: #AEC6CF;
-	min-height: 100px;
+    margin: 10px auto;
+    background: #AEC6CF;
+    min-height: 100px;
 }
 
 body > section {
@@ -83,17 +83,17 @@ table.Input td, table.Input th {
 }
 
 .strname {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .struser {
-	font-size: 15px;
-	font-weight: bold;
-	color: #0f0
+    font-size: 15px;
+    font-weight: bold;
+    color: #0f0
 }
 .strviews{
-	font-size: 15px;
-	font-weight: bold;
-	color: #f00
+    font-size: 15px;
+    font-weight: bold;
+    color: #f00
 }
 
