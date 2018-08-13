@@ -98,7 +98,7 @@ class FleastServer(object):
 
 def main():
     server = FleastServer()
-    # d = Daemonizer(cherrypy.engine).subscribe()
+    d = Daemonizer(cherrypy.engine).subscribe()
     cherrypy.quickstart(server, '/', './server.conf')
 
 
