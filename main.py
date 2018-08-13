@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from twitch import TwitchClient 
-
-import json
 import cherrypy
+import json
 from cherrypy.process.plugins import Daemonizer
+from twitch import TwitchClient
 
-ver = '1.03'
+ver = '1.04'
 
-
-repl = {'"':'&quot;', '&':'&amp;', '<':'&lt;', '>':'&gt;' } 
 
 class FleastServer(object):
     def __init__(self):
@@ -25,12 +22,17 @@ class FleastServer(object):
                 self.templ_stream = reader.read()
             with open('./web/fl_template_lang.html', 'r') as reader:
                 self.templ_lang = reader.read().splitlines()
-            self.client = TwitchClient(self.twitch_token, freq = 1)
+            self.client = TwitchClient(self.twitch_token, freq=1)
         except:
             print("Cannot read token for twitch app or templates, abort.")
             exit(1)
 
     def set_templ_lang(self, lang):
+        """
+            Set autoselected language in html
+            :param lang: string with the shortcut of language
+            :return: string with html list of languages and one is selected
+        """
         templ = ''
         end = False
         for l in self.templ_lang:
@@ -42,11 +44,15 @@ class FleastServer(object):
         return templ.rstrip()
 
     def to_html(self, text):
-        #return ''.join(repl.get(s,s) for s in text)
+        """
+            Relace all non xml symbols with aliases
+            :param text: string with html source code
+            :return: filtered string with html source code
+        """
+        repl = {'"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;'}
         for i in repl:
             text = text.replace(i, repl[i])
         return text
-
 
     @cherrypy.expose
     def index(self, game=None, lang=None):
@@ -55,39 +61,46 @@ class FleastServer(object):
     @cherrypy.expose
     def fleast(self, game=None, lang=None):
         if game is None or game == '':
-            return self.index_page.format(_version_ = ver, _opt_langs_ = self.set_templ_lang('ru'))
-
+            return self.index_page.format(_version_=ver,
+                                          _opt_langs_=self.set_templ_lang('ru'))
         game = game.rstrip()
-        cherrypy.log('Getting game:"%s" language:%s' % (game, lang))
+        cherrypy.log('Getting game:"{}" language:{}'.format(game, lang))
         data = self.client.get_live_streams(game, lang)
 
         if data is None:
-            return 'Internal Error<br>Tell me more at <a href="https://twitter.com/alexvanin">https://twitter.com/alexvanin</a>' 
+            return 'Internal Error<br>Tell me more at ' \
+                   '<a href="https://twitter.com/alexvanin">https://twitter.com/alexvanin</a>'
 
-        if data['_total'] == 0: 
-            return self.templ_main.format( _stream_num_ = data['_total'], _game_name_ = game, \
-                            _opt_langs_ = self.set_templ_lang(lang), _stream_list_ = '', \
-                            _version_ = ver)
-    
+        if data['_total'] == 0:
+            return self.templ_main.format(_stream_num_=data['_total'],
+                                          _game_name_=game,
+                                          _opt_langs_=self.set_templ_lang(lang),
+                                          _stream_list_='',
+                                          _version_=ver)
+
         cherrypy.log('Found %d streams' % data['_total'])
 
         streams = sorted(data['streams'], key=lambda k: k['viewers'])
         result_str = ''
         for s in streams:
-            result_str += self.templ_stream.format(s['channel']['url'], s['preview']['medium'], self.to_html(s['channel']['status']), \
-                                s['channel']['display_name'], s['viewers']) +'\n'
+            result_str += self.templ_stream.format(s['channel']['url'],
+                                                   s['preview']['medium'],
+                                                   self.to_html(s['channel']['status']),
+                                                   s['channel']['display_name'],
+                                                   s['viewers']) + '\n'
 
-        return self.templ_main.format(_stream_num_ = data['_total'], _game_name_ = game, \
-                        _opt_langs_ = self.set_templ_lang(lang), _stream_list_ = result_str,\
-                        _version_ = ver)
- 
+        return self.templ_main.format(_stream_num_=data['_total'],
+                                      _game_name_=game,
+                                      _opt_langs_=self.set_templ_lang(lang),
+                                      _stream_list_=result_str,
+                                      _version_=ver)
+
 
 def main():
     server = FleastServer()
-    d = Daemonizer(cherrypy.engine).subscribe()
+    # d = Daemonizer(cherrypy.engine).subscribe()
     cherrypy.quickstart(server, '/', './server.conf')
 
 
 if __name__ == '__main__':
     main()
-

@@ -125,7 +125,7 @@ class TwitchClient:
         while total > streams:
             r = self.do_q(q_template.format(base, name, lang, 100, streams), header)
             if r is None:
-                return []
+                return None
             data['streams'].extend(r['streams'])
             total = r['_total']
             streams = len(data['streams'])
