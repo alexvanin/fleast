@@ -2,35 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLeast</title>
-    <link rel="stylesheet" href="/fleast/style.css">
-    <link rel="shortcut icon" href="/flaest/favicon.ico" type="image/png">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/png">
 </head>
 
 <body>
     <section id="header">
-        <strong><h1>FLeast - your least favourite streamers here</h1></strong>
+        <strong>
+            <h1>FLeast - your least favourite streamers here</h1>
+        </strong>
     </section>
     <section id="pageContent">
         <article>
             <h2>Usage:</h2>
-            <p>Write the name of the game and select the language.<br>The name must _exactly_ match the name of the game on twitch.tv i.e. csgo must be "Counter-Strike: Global Offensive".</p>
-            <form method="get" action="/fleast">
+            <p>
+                Write the name of the game and select the language.<br>
+                The name must _exactly_ match the name of the game on twitch.tv
+                i.e. csgo must be "Counter-Strike: Global Offensive".
+            </p>
+            <form method="get" action="/">
             <table class="Input">
                 <tbody>
                     <tr>
-                        <td><label>Game </label></td>
-                        <td><label>Language </label></td>
+                        <td>
+                            <label>Game </label>
+                        </td>
+                        <td>
+                            <label>Language </label>
+                        </td>
                     </tr>
                     <tr>
-                        <td><input name="game" type="text" maxlength="255" value=""/> </td>
-                        <td><select class="element select medium" name="lang"> 
+                        <td>
+                            <input name="game" type="text" maxlength="255" value=""/>
+                        </td>
+                        <td>
+                            <select class="element select medium" name="lang">
 {_opt_langs_}
                             </select>
                         </td>
-                        <td><input type="submit" value="Search" /></td>
+                        <td>
+                            <input type="submit" value="Search" />
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -39,8 +52,11 @@
 
     </section>
     <footer>
-        <p>Developed by Alex Vanin | <a href="https://twitter.com/AlexVanin" target="_blank">twitter</a> | <a href="https://github.com/AlexVanin/fleast" target="_blank">github</a><br>
-        Version: {_version_} </p>
+        <p>
+            Developed by Alex Vanin | <a href="https://twitter.com/AlexVanin" target="_blank">twitter</a> |
+            <a href="https://github.com/AlexVanin/fleast" target="_blank">github</a><br>
+            Version: {_version_}
+        </p>
     </footer>
 </body>
 
