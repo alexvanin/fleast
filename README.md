@@ -1,8 +1,11 @@
 # fleast
 Least-favourite twitch streamers here
 
-
 ## Change-log
+### 1.04
+- Polished internal code and now cherrypy server configuration 
+is independent from nginx reverse proxy
+
 ### 1.03
 - Fixed bug when VOD-streams appear in list of live streams
 
