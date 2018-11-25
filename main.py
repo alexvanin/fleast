@@ -65,7 +65,7 @@ class FleastServer(object):
                                           _opt_langs_=self.set_templ_lang('ru'))
         game = game.rstrip()
         cherrypy.log('Getting game:"{}" language:{}'.format(game, lang))
-        data = self.client.get_live_streams(game, lang)
+        data = self.client.get_live_streams(game.replace(' ', '%20').replace('&', '%26'), lang)
 
         if data is None:
             return 'Internal Error<br>Tell me more at ' \
