@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy
-import json
 from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
-ver = '1.04'
+ver = '1.5'
 
 
 class FleastServer(object):
@@ -65,7 +64,10 @@ class FleastServer(object):
                                           _opt_langs_=self.set_templ_lang('ru'))
         game = game.rstrip()
         cherrypy.log('Getting game:"{}" language:{}'.format(game, lang))
-        data = self.client.get_live_streams(game.replace(' ', '%20').replace('&', '%26'), lang)
+        if game == "IRL":
+            data = self.client.get_irl_live_streams_v6(lang)
+        else:
+            data = self.client.get_live_streams(game.replace(' ', '%20').replace('&', '%26'), lang)
 
         if data is None:
             return 'Internal Error<br>Tell me more at ' \
@@ -80,14 +82,25 @@ class FleastServer(object):
 
         cherrypy.log('Found %d streams' % data['_total'])
 
-        streams = sorted(data['streams'], key=lambda k: k['viewers'])
-        result_str = ''
-        for s in streams:
-            result_str += self.templ_stream.format(s['channel']['url'],
-                                                   s['preview']['medium'],
-                                                   self.to_html(s['channel']['status']),
-                                                   s['channel']['display_name'],
-                                                   s['viewers']) + '\n'
+        if game == "IRL":
+            streams = sorted(data['streams'], key=lambda k: k['viewer_count'])
+            result_str = ''
+            irl_url = 'https://twitch.tv/{}'
+            for s in streams:
+                result_str += self.templ_stream.format(irl_url.format(s['user_name']),
+                                                       s['thumbnail_url'].format(width=320, height=180),
+                                                       self.to_html(s['title']),
+                                                       s['user_name'],
+                                                       s['viewer_count']) + '\n'
+        else:
+            streams = sorted(data['streams'], key=lambda k: k['viewers'])
+            result_str = ''
+            for s in streams:
+                result_str += self.templ_stream.format(s['channel']['url'],
+                                                       s['preview']['medium'],
+                                                       self.to_html(s['channel']['status']),
+                                                       s['channel']['display_name'],
+                                                       s['viewers']) + '\n'
 
         return self.templ_main.format(_stream_num_=data['_total'],
                                       _game_name_=game,
