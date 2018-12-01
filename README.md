@@ -2,6 +2,9 @@
 Least-favourite twitch streamers here
 
 ## Change Log
+### 1.6
+- Fixed bug, when IRL query could contain several copies of one stream
+
 ### 1.5
 - IRL section is back with IRL query
 - Fixed bug when games with `&` symbol could not found correctly.  
