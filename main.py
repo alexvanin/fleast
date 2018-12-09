@@ -5,7 +5,7 @@ import cherrypy
 from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
-ver = '1.6'
+ver = '1.7'
 
 
 class FleastServer(object):
@@ -48,7 +48,8 @@ class FleastServer(object):
             :param text: string with html source code
             :return: filtered string with html source code
         """
-        repl = {'"': '&quot;', '&': '&amp;', '<': '&lt;', '>': '&gt;'}
+        repl = {'"': '&quot;', '<': '&lt;', '>': '&gt;'}
+        text.replace('&', '&amp;')
         for i in repl:
             text = text.replace(i, repl[i])
         return text
