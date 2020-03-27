@@ -97,7 +97,6 @@ class FleastServer(object):
                                                            s['user_name'],
                                                            s['viewer_count']) + '\n'
         else:
-
             streams = sorted(data['streams'], key=lambda k: k['viewers'])
             result_str = ''
             for s in streams:
@@ -107,7 +106,7 @@ class FleastServer(object):
                                                        s['channel']['display_name'],
                                                        s['viewers']) + '\n'
 
-        return self.templ_main.format(_stream_num_=data['_total'],
+        return self.templ_main.format(_stream_num_=len(streams),
                                       _game_name_=game,
                                       _opt_langs_=self.set_templ_lang(lang),
                                       _stream_list_=result_str,

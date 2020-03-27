@@ -147,7 +147,7 @@ class TwitchClient:
 
         result = {'_total': 0, 'streams': []}
         data = self.do_q(init_q_template.format(base, lang, 100, game_id), header)
-        while len(data.get('data', [])) != 0:
+        while len(data.get('data', [])) > 0.8*100:
             result['streams'].extend(data['data'])
             data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
         result['_total'] = len(result['streams'])
