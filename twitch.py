@@ -114,23 +114,23 @@ class TwitchClient:
                 https://dev.twitch.tv/docs/v5/reference/search/#search-streams
         """
         header, base = self.get_base('v5')
-        init_q_template = '{}/streams/?game={}&language={}&limit={}&stream_type=live'
-        q_template = '{}/streams/?game={}&language={}&limit={}&stream_type=live&offset={}'
-        data = self.do_q(init_q_template.format(base, name, lang, 100), header)
+        init_q_template = '{}/search/streams?query={}&limit={}'
+        q_template = '{}/search/streams?query={}&limit={}&offset={}'
+        data = self.do_q(init_q_template.format(base, name, 100), header)
         if data is None:
             return []
         total = data['_total']
         streams = len(data['streams'])
 
         while total > streams:
-            r = self.do_q(q_template.format(base, name, lang, 100, streams), header)
+            r = self.do_q(q_template.format(base, name, 100, streams), header)
             if r is None:
                 return None
             data['streams'].extend(r['streams'])
             total = r['_total']
             streams = len(data['streams'])
         # Tweak for getting only live sterams
-        data['streams'] = [x for x in data['streams'] if x['stream_type'] == 'live']
+        data['streams'] = [x for x in data['streams'] if x['stream_type'] == 'live' and x['channel']['language'] == lang and x['game'] == name ]
         data['_total'] = len(data['streams'])
         return data
 
@@ -147,9 +147,8 @@ class TwitchClient:
 
         result = {'_total': 0, 'streams': []}
         data = self.do_q(init_q_template.format(base, lang, 100, game_id), header)
-        result['streams'].extend(data['data'])
-        while len(data['data']) == 100:
-            data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
+        while len(data.get('data', [])) != 0:
             result['streams'].extend(data['data'])
+            data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
         result['_total'] = len(result['streams'])
         return result
