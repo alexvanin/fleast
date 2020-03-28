@@ -91,7 +91,7 @@ class TwitchClient:
             :param lang: string with the shortcut of language
             :return: list of all streams which are live
         """
-        return self.get_live_streams_v5(name, lang)
+        return self.get_live_streams_v6(name, lang)
 
     def get_game_id_v5(self, name):
         """
@@ -105,14 +105,19 @@ class TwitchClient:
             return r['games'][0]['_id'], r['games'][0]['name']
         return None, None
 
+    def get_game_id_v6(self, name):
+        """
+        Getting game id with API v6
+        :param name: string with the name of game
+        :return: tuple of integer with game id and string with game name or (None,None)
+        """
+
+        header, base = self.get_base('v6')
+        r = self.do_q('{}/games?name={}'.format(base, name), header)
+        if r and r.get('data'):
+            return r['data'][0]['id'], r['data'][0]['name']
+
     def get_live_streams_v5(self, name, lang):
-        """
-            Getting list of livestreams with API v5
-            :param name: string with the name of game
-            :param lang: string with the shortcut of language
-            :return: list of all streams which are live with this format -
-                https://dev.twitch.tv/docs/v5/reference/search/#search-streams
-        """
         header, base = self.get_base('v5')
         init_q_template = '{}/search/streams?query={}&limit={}'
         q_template = '{}/search/streams?query={}&limit={}&offset={}'
@@ -133,6 +138,30 @@ class TwitchClient:
         data['streams'] = [x for x in data['streams'] if x['stream_type'] == 'live' and x['channel']['language'] == lang and x['game'] == name ]
         data['_total'] = len(data['streams'])
         return data
+
+    def get_live_streams_v6(self, name, lang):
+        """
+            Getting list of livestreams with API v5
+            :param name: string with the name of game
+            :param lang: string with the shortcut of language
+            :return: list of all streams which are live with this format -
+                https://dev.twitch.tv/docs/v5/reference/search/#search-streams
+        """
+        result = {'_total': 0, 'streams': []}
+        game_id = self.get_game_id_v6(name)
+        if game_id[0] is None:
+            return result
+
+        header, base = self.get_base('v6')
+        init_q_template = "{}/streams?language={}&first={}&game_id={}"
+        q_template = "{}/streams?language={}&first={}&after={}&game_id={}"
+
+        data = self.do_q(init_q_template.format(base, lang, 100, game_id[0]), header)
+        while len(data.get('data', [])) > 0.8*100:
+            result['streams'].extend(data['data'])
+            data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id[0]), header)
+        result['_total'] = len(result['streams'])
+        return result
 
     def get_irl_live_streams_v6(self, lang):
         header, base = self.get_base('v6')

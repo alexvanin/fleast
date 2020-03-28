@@ -5,7 +5,7 @@ import cherrypy
 from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
-ver = '1.8'
+ver = '1.9-pre'
 
 
 class FleastServer(object):
@@ -83,28 +83,18 @@ class FleastServer(object):
 
         cherrypy.log('Found %d streams' % data['_total'])
 
-        if game == "IRL":
-            uniq_streams = []
-            streams = sorted(data['streams'], key=lambda k: k['viewer_count'])
-            result_str = ''
-            irl_url = 'https://twitch.tv/{}'
-            for s in streams:
-                if s['user_name'] not in uniq_streams:
-                    uniq_streams.append(s['user_name'])
-                    result_str += self.templ_stream.format(irl_url.format(s['user_name']),
-                                                           s['thumbnail_url'].format(width=320, height=180),
-                                                           self.to_html(s['title']),
-                                                           s['user_name'],
-                                                           s['viewer_count']) + '\n'
-        else:
-            streams = sorted(data['streams'], key=lambda k: k['viewers'])
-            result_str = ''
-            for s in streams:
-                result_str += self.templ_stream.format(s['channel']['url'],
-                                                       s['preview']['medium'],
-                                                       self.to_html(s['channel']['status']),
-                                                       s['channel']['display_name'],
-                                                       s['viewers']) + '\n'
+        uniq_streams = []
+        streams = sorted(data['streams'], key=lambda k: k['viewer_count'])
+        result_str = ''
+        irl_url = 'https://twitch.tv/{}'
+        for s in streams:
+            if s['user_name'] not in uniq_streams:
+                uniq_streams.append(s['user_name'])
+                result_str += self.templ_stream.format(irl_url.format(s['user_name']),
+                                                       s['thumbnail_url'].format(width=320, height=180),
+                                                       self.to_html(s['title']),
+                                                       s['user_name'],
+                                                       s['viewer_count']) + '\n'
 
         return self.templ_main.format(_stream_num_=len(streams),
                                       _game_name_=game,
