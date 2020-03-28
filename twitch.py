@@ -2,6 +2,7 @@ import cherrypy
 import requests
 import threading
 import time
+from urllib.parse import quote
 
 
 class TwitchClient:
@@ -148,15 +149,15 @@ class TwitchClient:
                 https://dev.twitch.tv/docs/v5/reference/search/#search-streams
         """
         result = {'_total': 0, 'streams': []}
-        game_id = self.get_game_id_v6(name)
-        if game_id[0] is None:
+        game_id = self.get_game_id_v6(quote(name))
+        if game_id is None:
             return result
 
         header, base = self.get_base('v6')
         init_q_template = "{}/streams?language={}&first={}&game_id={}"
         q_template = "{}/streams?language={}&first={}&after={}&game_id={}"
-
         data = self.do_q(init_q_template.format(base, lang, 100, game_id[0]), header)
+        result['streams'].extend(data['data'])
         while len(data.get('data', [])) > 0.8*100:
             result['streams'].extend(data['data'])
             data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id[0]), header)
@@ -176,6 +177,7 @@ class TwitchClient:
 
         result = {'_total': 0, 'streams': []}
         data = self.do_q(init_q_template.format(base, lang, 100, game_id), header)
+        result['streams'].extend(data['data'])
         while len(data.get('data', [])) > 0.8*100:
             result['streams'].extend(data['data'])
             data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
