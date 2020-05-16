@@ -5,7 +5,7 @@ import cherrypy
 from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
-ver = '1.9.0-pre-2'
+ver = '1.9.0-pre-3'
 
 
 class FleastServer(object):

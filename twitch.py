@@ -14,7 +14,7 @@ class TwitchClient:
         self.header_v5 = {'Client-ID': self.token,
                           'Authorization': 'Bearer ' + self.oath,
                           'Accept': 'application/vnd.twitchtv.v5+json'}
-        self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer '+self.oath}
+        self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer ' + self.oath}
         self.urlbase_v5 = 'https://api.twitch.tv/kraken'
         self.urlbase_v6 = 'https://api.twitch.tv/helix'
 
@@ -138,7 +138,8 @@ class TwitchClient:
             total = r['_total']
             streams = len(data['streams'])
         # Tweak for getting only live sterams
-        data['streams'] = [x for x in data['streams'] if x['stream_type'] == 'live' and x['channel']['language'] == lang and x['game'] == name ]
+        data['streams'] = [x for x in data['streams'] if
+                           x['stream_type'] == 'live' and x['channel']['language'] == lang and x['game'] == name]
         data['_total'] = len(data['streams'])
         return data
 
@@ -160,11 +161,10 @@ class TwitchClient:
         q_template = "{}/streams?language={}&first={}&after={}&game_id={}"
         data = self.do_q(init_q_template.format(base, lang, 100, game_id[0]), header)
         result['streams'].extend(data['data'])
-        while len(data.get('data', [])) > 0.8*100:
+        while len(data.get('data', [])) > 0:  # there must be non zero value, but search is kinda broken now
             result['streams'].extend(data['data'])
             data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id[0]), header)
-        result['_total'] = len(result['streams'])
-        return result
+        return self.unique_streams_v6(result)
 
     def get_irl_live_streams_v6(self, lang):
         header, base = self.get_base('v6')
@@ -180,8 +180,17 @@ class TwitchClient:
         result = {'_total': 0, 'streams': []}
         data = self.do_q(init_q_template.format(base, lang, 100, game_id), header)
         result['streams'].extend(data['data'])
-        while len(data.get('data', [])) > 0.8*100:
+        while len(data.get('data', [])) > 0:  # there must be non zero value, but search is kinda broken now
             result['streams'].extend(data['data'])
             data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
+        return self.unique_streams_v6(result)
+
+    def unique_streams_v6(self, result):
+        uniq_streams = []
+        streams = sorted(result['streams'], key=lambda k: k['viewer_count'])
+        for s in streams:
+            if s['user_name'] not in uniq_streams:
+                uniq_streams.append(s['user_name'])
+        result['streams'] = uniq_streams
         result['_total'] = len(result['streams'])
         return result
