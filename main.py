@@ -5,7 +5,7 @@ import cherrypy
 from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
-ver = '1.9-pre'
+ver = '1.9.0-pre-2'
 
 
 class FleastServer(object):
@@ -13,6 +13,8 @@ class FleastServer(object):
         try:
             with open('.token', 'r') as reader:
                 self.twitch_token = reader.read().strip()
+            with open('.oath', 'r') as reader:
+                self.oath_token = reader.read().strip()
             with open('./web/fl.html', 'r') as reader:
                 self.index_page = reader.read()
             with open('./web/fl_template_main.html', 'r') as reader:
@@ -21,7 +23,7 @@ class FleastServer(object):
                 self.templ_stream = reader.read()
             with open('./web/fl_template_lang.html', 'r') as reader:
                 self.templ_lang = reader.read().splitlines()
-            self.client = TwitchClient(self.twitch_token, freq=1)
+            self.client = TwitchClient(self.twitch_token, self.oath_token, freq=1)
         except:
             print("Cannot read token for twitch app or templates, abort.")
             exit(1)
