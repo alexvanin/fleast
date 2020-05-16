@@ -188,9 +188,10 @@ class TwitchClient:
     def unique_streams_v6(self, result):
         uniq_streams = []
         streams = sorted(result['streams'], key=lambda k: k['viewer_count'])
+        result['streams']=[]
         for s in streams:
             if s['user_name'] not in uniq_streams:
                 uniq_streams.append(s['user_name'])
-        result['streams'] = uniq_streams
+                result['streams'].append(s)
         result['_total'] = len(result['streams'])
         return result

@@ -84,21 +84,16 @@ class FleastServer(object):
                                           _version_=ver)
 
         cherrypy.log('Found %d streams' % data['_total'])
-
-        uniq_streams = []
-        streams = sorted(data['streams'], key=lambda k: k['viewer_count'])
         result_str = ''
         irl_url = 'https://twitch.tv/{}'
-        for s in streams:
-            if s['user_name'] not in uniq_streams:
-                uniq_streams.append(s['user_name'])
-                result_str += self.templ_stream.format(irl_url.format(s['user_name']),
+        for s in data['streams']:
+            result_str += self.templ_stream.format(irl_url.format(s['user_name']),
                                                        s['thumbnail_url'].format(width=320, height=180),
                                                        self.to_html(s['title']),
                                                        s['user_name'],
                                                        s['viewer_count']) + '\n'
 
-        return self.templ_main.format(_stream_num_=len(streams),
+        return self.templ_main.format(_stream_num_=len(data['streams']),
                                       _game_name_=game,
                                       _opt_langs_=self.set_templ_lang(lang),
                                       _stream_list_=result_str,
