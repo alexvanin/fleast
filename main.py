@@ -4,7 +4,7 @@
 import cherrypy
 from twitch import TwitchClient
 
-ver = '1.9.0-pre-3'
+ver = '1.9.0'
 
 
 class FleastServer(object):

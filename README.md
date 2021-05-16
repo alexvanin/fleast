@@ -3,6 +3,25 @@ Least-favourite twitch streamers here
 
 
 ## Change Log
+### 1.9
+#### Fixed
+- Char escaping and various typos.
+- Unique filter for streams.
+
+#### Added
+- Runtime ouath token generation.
+
+#### Changed
+- Use threshold on amount of returned streams to resend requests.
+
+#### Removed
+- v5 (kraken) API support.
+- Daemonizer component.
+
+### 1.8
+#### Fixed
+- Search queries for v5 and v6 API
+
 ### 1.7
 - Fixed bug with displaying special symbols in stream name
 ### 1.6
