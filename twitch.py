@@ -66,7 +66,7 @@ class TwitchClient:
             r = requests.get(base, headers=header).json()
             error_message = r.get("error", "")
             if len(error_message) > 0:
-                cherrypy.log(f'Request: fail with error "{error_message}"')
+                cherrypy.log('Request: fail with error "%s"' % error_message)
                 r = None
             else:
                 cherrypy.log('Request: OK')
