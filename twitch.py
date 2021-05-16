@@ -11,11 +11,7 @@ class TwitchClient:
         self.oauth = oauth
         self.lock = threading.Lock()
 
-        self.header_v5 = {'Client-ID': self.token,
-                          'Authorization': 'Bearer ' + self.oauth,
-                          'Accept': 'application/vnd.twitchtv.v5+json'}
         self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer ' + self.oauth}
-        self.urlbase_v5 = 'https://api.twitch.tv/kraken'
         self.urlbase_v6 = 'https://api.twitch.tv/helix'
 
         self.last_q = time.time()
@@ -52,9 +48,7 @@ class TwitchClient:
             :return: tuple with list of headers and URL string
             :raises: value error on incorrect API version
         """
-        if ver == 'v5':
-            return self.header_v5, self.urlbase_v5
-        elif ver == 'v6':
+        if ver == 'v6':
             return self.header_v6, self.urlbase_v6
         else:
             raise ValueError('Not supported API version')
@@ -70,44 +64,6 @@ class TwitchClient:
         header, base = self.get_base('v6')
         return self.do_q(base + q, header)
 
-    def raw_query_v5(self, q):
-        """
-            Do a query with API v5
-            :param q: query string
-            :return: string with get query result or None
-        """
-        header, base = self.get_base('v5')
-        return self.do_q(base + q, header)
-
-    def get_game_id(self, name):
-        """
-            Getting game id
-            :param name: string with the name of game
-            :return: tuple of integer with game id and string with game name or None, None
-        """
-        return self.get_game_id_v5(name)
-
-    def get_live_streams(self, name, lang):
-        """
-            Getting list of livestreams
-            :param name: string with the name of game
-            :param lang: string with the shortcut of language
-            :return: list of all streams which are live
-        """
-        return self.get_live_streams_v6(name, lang)
-
-    def get_game_id_v5(self, name):
-        """
-            Getting game id with API v5
-            :param name: string with the name of game
-            :return: tuple of integer with game id and string with game name or None, None
-        """
-        header, base = self.get_base('v5')
-        r = self.do_q('{}/search/games?query={}'.format(base, name), header)
-        if r and r.get('games'):
-            return r['games'][0]['_id'], r['games'][0]['name']
-        return None, None
-
     def get_game_id_v6(self, name):
         """
         Getting game id with API v6
@@ -119,29 +75,6 @@ class TwitchClient:
         r = self.do_q('{}/games?name={}'.format(base, name), header)
         if r and r.get('data'):
             return r['data'][0]['id'], r['data'][0]['name']
-
-    def get_live_streams_v5(self, name, lang):
-        header, base = self.get_base('v5')
-        init_q_template = '{}/search/streams?query={}&limit={}'
-        q_template = '{}/search/streams?query={}&limit={}&offset={}'
-        data = self.do_q(init_q_template.format(base, name, 100), header)
-        if data is None:
-            return []
-        total = data['_total']
-        streams = len(data['streams'])
-
-        while total > streams:
-            r = self.do_q(q_template.format(base, name, 100, streams), header)
-            if r is None:
-                return None
-            data['streams'].extend(r['streams'])
-            total = r['_total']
-            streams = len(data['streams'])
-        # Tweak for getting only live sterams
-        data['streams'] = [x for x in data['streams'] if
-                           x['stream_type'] == 'live' and x['channel']['language'] == lang and x['game'] == name]
-        data['_total'] = len(data['streams'])
-        return data
 
     def get_live_streams_v6(self, name, lang):
         """

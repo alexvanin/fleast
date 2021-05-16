@@ -69,7 +69,7 @@ class FleastServer(object):
         if game == "IRL":
             data = self.client.get_irl_live_streams_v6(lang)
         else:
-            data = self.client.get_live_streams(game, lang)
+            data = self.client.get_live_streams_v6(game, lang)
 
         if data is None:
             return 'Internal Error<br>Tell me more at ' \
