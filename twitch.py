@@ -2,20 +2,53 @@ import cherrypy
 import requests
 import threading
 import time
+
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
 from urllib.parse import quote
 
 
 class TwitchClient:
-    def __init__(self, token, oauth, freq=2):
+    def __init__(self, token, secret, freq=2):
         self.token = token
-        self.oauth = oauth
         self.lock = threading.Lock()
 
-        self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer ' + self.oauth}
+        self.header_v6 = {'Client-ID': self.token}
         self.urlbase_v6 = 'https://api.twitch.tv/helix'
 
         self.last_q = time.time()
         self.delay = 1 / freq
+
+        # authentication
+        self.oauth = ''
+        self.oauth_token_url = 'https://id.twitch.tv/oauth2/token'
+        self.auth_secret = secret
+        oauth_clint = BackendApplicationClient(client_id=self.token)
+        self.oauth_session = OAuth2Session(client=oauth_clint)
+        self.update_oauth()
+
+    def update_oauth(self):
+        """
+            Update self.oauth token based on client id and secret.
+            :return: nothing
+        """
+        token = self.oauth_session.fetch_token(token_url=self.oauth_token_url,
+                                               client_secret=self.auth_secret,
+                                               include_client_id=True)
+        self.oauth = token['access_token']
+
+    def do_q_auth_v6(self, base, header):
+        """
+            Do query with v6 authentication header and single retry.
+            :param base: string with requesting URL
+            :param header: dictionary of http headers
+            :return: string with response or None
+        """
+        result = self.do_q(base, header | {'Authorization': 'Bearer ' + self.oauth})
+        if result is not None:
+            return result
+        self.update_oauth()
+        return self.do_q(base, header | {'Authorization': 'Bearer ' + self.oauth})
 
     def do_q(self, base, header):
         """
@@ -31,8 +64,13 @@ class TwitchClient:
             if delta < self.delay:
                 time.sleep(delta)  # Sleep remaining time
             r = requests.get(base, headers=header).json()
+            error_message = r.get("error", "")
+            if len(error_message) > 0:
+                cherrypy.log(f'Request: fail with error "{error_message}"')
+                r = None
+            else:
+                cherrypy.log('Request: OK')
             self.last_q = time.time()
-            cherrypy.log('Request: OK')
         except requests.exceptions.RequestException as e:
             cherrypy.log('Request: FAIL')
             cherrypy.log('Error: {}'.format(e))
@@ -62,7 +100,7 @@ class TwitchClient:
             :return: string with get query result or None
         """
         header, base = self.get_base('v6')
-        return self.do_q(base + q, header)
+        return self.do_q_auth_v6(base + q, header)
 
     def get_game_id_v6(self, name):
         """
@@ -72,7 +110,7 @@ class TwitchClient:
         """
 
         header, base = self.get_base('v6')
-        r = self.do_q('{}/games?name={}'.format(base, name), header)
+        r = self.do_q_auth_v6('{}/games?name={}'.format(base, name), header)
         if r and r.get('data'):
             return r['data'][0]['id'], r['data'][0]['name']
 
@@ -92,11 +130,11 @@ class TwitchClient:
         header, base = self.get_base('v6')
         init_q_template = "{}/streams?language={}&first={}&game_id={}"
         q_template = "{}/streams?language={}&first={}&after={}&game_id={}"
-        data = self.do_q(init_q_template.format(base, lang, 100, game_id[0]), header)
+        data = self.do_q_auth_v6(init_q_template.format(base, lang, 100, game_id[0]), header)
         result['streams'].extend(data['data'])
         while len(data.get('data', [])) > 0:  # there must be non zero value, but search is kinda broken now
             result['streams'].extend(data['data'])
-            data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id[0]), header)
+            data = self.do_q_auth_v6(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id[0]), header)
         return self.unique_streams_v6(result)
 
     def get_irl_live_streams_v6(self, lang):
@@ -111,11 +149,11 @@ class TwitchClient:
             game_id += '&game_id={}'.format(irl_id)
 
         result = {'_total': 0, 'streams': []}
-        data = self.do_q(init_q_template.format(base, lang, 100, game_id), header)
+        data = self.do_q_auth_v6(init_q_template.format(base, lang, 100, game_id), header)
         result['streams'].extend(data['data'])
         while len(data.get('data', [])) > 0:  # there must be non zero value, but search is kinda broken now
             result['streams'].extend(data['data'])
-            data = self.do_q(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
+            data = self.do_q_auth_v6(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
         return self.unique_streams_v6(result)
 
     def unique_streams_v6(self, result):
