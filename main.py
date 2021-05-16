@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy
-from cherrypy.process.plugins import Daemonizer
 from twitch import TwitchClient
 
 ver = '1.9.0-pre-3'
@@ -102,7 +101,6 @@ class FleastServer(object):
 
 def main():
     server = FleastServer()
-    d = Daemonizer(cherrypy.engine).subscribe()
     cherrypy.quickstart(server, '/', './server.conf')
 
 
