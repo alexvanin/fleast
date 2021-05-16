@@ -6,15 +6,15 @@ from urllib.parse import quote
 
 
 class TwitchClient:
-    def __init__(self, token, oath, freq=2):
+    def __init__(self, token, oauth, freq=2):
         self.token = token
-        self.oath = oath
+        self.oauth = oauth
         self.lock = threading.Lock()
 
         self.header_v5 = {'Client-ID': self.token,
-                          'Authorization': 'Bearer ' + self.oath,
+                          'Authorization': 'Bearer ' + self.oauth,
                           'Accept': 'application/vnd.twitchtv.v5+json'}
-        self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer ' + self.oath}
+        self.header_v6 = {'Client-ID': self.token, 'Authorization': 'Bearer ' + self.oauth}
         self.urlbase_v5 = 'https://api.twitch.tv/kraken'
         self.urlbase_v6 = 'https://api.twitch.tv/helix'
 

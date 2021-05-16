@@ -13,8 +13,8 @@ class FleastServer(object):
         try:
             with open('.token', 'r') as reader:
                 self.twitch_token = reader.read().strip()
-            with open('.oath', 'r') as reader:
-                self.oath_token = reader.read().strip()
+            with open('.oauth', 'r') as reader:
+                self.oauth_token = reader.read().strip()
             with open('./web/fl.html', 'r') as reader:
                 self.index_page = reader.read()
             with open('./web/fl_template_main.html', 'r') as reader:
@@ -23,7 +23,7 @@ class FleastServer(object):
                 self.templ_stream = reader.read()
             with open('./web/fl_template_lang.html', 'r') as reader:
                 self.templ_lang = reader.read().splitlines()
-            self.client = TwitchClient(self.twitch_token, self.oath_token, freq=1)
+            self.client = TwitchClient(self.twitch_token, self.oauth_token, freq=1)
         except:
             print("Cannot read token for twitch app or templates, abort.")
             exit(1)
@@ -88,10 +88,10 @@ class FleastServer(object):
         irl_url = 'https://twitch.tv/{}'
         for s in data['streams']:
             result_str += self.templ_stream.format(irl_url.format(s['user_name']),
-                                                       s['thumbnail_url'].format(width=320, height=180),
-                                                       self.to_html(s['title']),
-                                                       s['user_name'],
-                                                       s['viewer_count']) + '\n'
+                                                   s['thumbnail_url'].format(width=320, height=180),
+                                                   self.to_html(s['title']),
+                                                   s['user_name'],
+                                                   s['viewer_count']) + '\n'
 
         return self.templ_main.format(_stream_num_=len(data['streams']),
                                       _game_name_=game,
