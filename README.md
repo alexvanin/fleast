@@ -3,6 +3,11 @@ Least-favourite twitch streamers here
 
 
 ## Change Log
+### 1.9.1
+#### Fixed
+- Server does not fail when processing API response withour `cursor` field.
+- String formatting for older python3 versions.
+
 ### 1.9
 #### Fixed
 - Char escaping and various typos.
