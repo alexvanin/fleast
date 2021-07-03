@@ -150,7 +150,6 @@ class TwitchClient:
 
         result = {'_total': 0, 'streams': []}
         data = self.do_q_auth_v6(init_q_template.format(base, lang, 100, game_id), header)
-        result['streams'].extend(data['data'])
         while len(data.get('data', [])) > 0:  # there must be non zero value, but search is kinda broken now
             result['streams'].extend(data['data'])
             data = self.do_q_auth_v6(q_template.format(base, lang, 100, data['pagination']['cursor'], game_id), header)
