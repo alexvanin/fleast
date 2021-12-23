@@ -3,66 +3,98 @@
 <head>
     <meta charset="utf-8">
     <title>FLeast</title>
-    <link rel="stylesheet" href="./style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="./favicon.ico" type="image/png">
 </head>
 
+<style>
+    .container-sm {{
+        max-width: 1450px;
+    }}
+
+    body {{
+        background-color: #333333;
+    }}
+
+    footer {{
+        background-color: #AEC6CF;
+    }}
+
+    .strname {{
+        font-weight: bold;
+    }}
+
+    .struser {{
+        font-size: 15px;
+        font-weight: bold;
+        color: #0f0
+    }}
+
+    .strviews {{
+        font-size: 15px;
+        font-weight: bold;
+        color: #f00
+    }}
+
+    .grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 340px));
+        justify-content: space-around;
+        row-gap: 30px;
+    }}
+</style>
+
 <body>
-    <section id="header">
-        <strong><h1>FLeast - your least favourite streamers here</h1></strong>
-    </section>
-    <section id="pageContent">
-        <article>
-            <h2>Usage:</h2>
-            <p>
-                Write the name of the game and select the language.<br>
-                The name must _exactly_ match the name of the game on twitch.tv
-                i.e. csgo must be "Counter-Strike: Global Offensive".<br><br>
-                You can type <b>IRL</b> in game field and it will output streams from
-                <i>Just Chatting</i>, <i>Travel & Outdoors</i>, etc...
-            </p>
-            <form method="get" action="./">
-            <table class="Input">
-                <tbody>
-                    <tr>
-                        <td>
-                            <label>Game </label>
-                        </td>
-                        <td>
-                            <label>Language </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input name="game" type="text" maxlength="255" value=""/>
-                        </td>
-                        <td>
-                            <select class="element select medium" name="lang">
+    <div class="container-sm text-white">
+        <br>
+        <h1>Fleast — find new favourite small streamer</h1>
+        <hr>
+        <p>
+            The category must be specified by <b>exact name</b>.<br>Search
+            <b>IRL</b> to find streams from <i>Just Chatting</i>,
+            <i>Travel & Outdoors</i>, and other categories.
+        </p>
+        <form method="get" action="./">
+            <table>
+                <tr>
+                    <td>
+                        Category
+                    </td>
+                    <td>
+                        Language
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input name="game" type="text" class="form-control-sm" maxlength="255" value="{_game_name_}" placeholder="Specify category"/>
+                    </td>
+                    <td>
+                        <select name="lang" class="form-control-sm">
 {_opt_langs_}
-                            </select>
-                        </td>
-                        <td>
-                            <input type="submit" value="Search" />
-                        </td>
-                    </tr>
-                </tbody>
+                        </select>
+                     </td>
+                    <td>
+                        <input type="submit" value="Search" class="btn btn-primary btn-sm"/>
+                    </td>
+                </tr>
             </table>
-            </form>
-        </article>
-        <article>
-            <h2>Found {_stream_num_} streams: </h2><br>
-            <div class="container">
+        </form>
+        <hr>
+        <h4> Found {_stream_num_} streams:</h4>
+        <div class="grid">
 {_stream_list_}
+        </div>
+        <hr>
+        <footer>
+            <div class="text-end text-black p-2">
+                Developed by Alexey Vanin | <a href="https://twitter.com/AlexVanin" target="_blank">twitter</a> |
+                <a href="https://github.com/AlexVanin/fleast" target="_blank">github</a><br>
+                    Version: {_version_}
+                </p>
             </div>
-        </article>
-    </section>
-    <footer>
-       <p>
-            Developed by Alex Vanin | <a href="https://twitter.com/AlexVanin" target="_blank">twitter</a> |
-            <a href="https://github.com/AlexVanin/fleast" target="_blank">github</a><br>
-            Version: {_version_}
-       </p>
-    </footer>
+        </footer>
+    </div>
 </body>
 
 </html>
+
