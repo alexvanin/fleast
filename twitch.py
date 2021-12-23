@@ -143,8 +143,28 @@ class TwitchClient:
         q_template = "{}/streams?language={}&first={}&after={}{}"
 
         game_id = ''
-        irl_ids = ["509660", "509673", "509667", "509669", "509670", "509658",
-                   "509672", "509671", "509664", "509663", "417752", "509659"]
+        """
+        417752: Talk Shows & Podcasts
+        509658: Just Chatting
+        509659: ASMR
+        509660: Art
+        509663: Special Events
+        509664: Tabletop RPGs
+        509667: Food & Drink
+        509669: Beauty & Body Art
+        509670: Science & Technology
+        509671: Fitness & Health [exclude]
+        509672: Travel & Outdoors
+        509673: Makers & Crafting       
+        515214: Politics [exclude]
+        518203: Sports
+        116747788: Pools, Hot Tubs, and Beaches
+        272263131: Animals, Aquariums, and Zoos [exclude]
+        1469308723: Software and Game Development
+        """
+        irl_ids = ["417752", "509658", "509659", "509660", "509663", "509664",
+                   "509667", "509669", "509670", "509672", "509673", "518203",
+                   "116747788", "1469308723"]
         for irl_id in irl_ids:
             game_id += '&game_id={}'.format(irl_id)
 
