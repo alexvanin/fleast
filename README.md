@@ -3,6 +3,10 @@ Least-favourite twitch streamers here
 
 
 ## Change Log
+### 1.10.0
+#### Changed
+- Refresh website design
+
 ### 1.9.1
 #### Fixed
 - Server does not fail when processing API response withour `cursor` field.
