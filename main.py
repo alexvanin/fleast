@@ -90,7 +90,7 @@ class FleastServer(object):
                                                    s['thumbnail_url'].format(width=320, height=180),
                                                    self.to_html(s['title']),
                                                    s['user_name'],
-                                                   s['viewer_count']) + '\n'
+                                                   s['viewer_count'])
 
         return self.templ_main.format(_stream_num_=len(data['streams']),
                                       _game_name_=game,
